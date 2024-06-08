@@ -36,6 +36,34 @@ const get = async (req, res, next) => {
 	}
 };
 
+const getCart = async (req, res, next) => {
+	try {
+		const order = await prismaClient.order.findUnique({
+			where: {
+				userId: req.user.id,
+				isCheckedOut: null,
+			},
+			include: {
+				items: {
+					include: {
+						product: true,
+					},
+				},
+			},
+		});
+
+		if (!order) {
+			throw new ResponseError(404, "Order not found");
+		}
+
+		res.status(200).json({
+			data: order,
+		});
+	} catch (e) {
+		next(e);
+	}
+};
+
 const checkout = async (req, res, next) => {
 	try {
 		const { customerName, customerPhone, customerAddress } = validate(checkoutOrderValidation, req.body);
@@ -148,6 +176,9 @@ const getMany = async (req, res, next) => {
 		const orders = await prismaClient.order.findMany({
 			where: {
 				userId: req.user.id,
+				isCheckedOut: {
+					not: null,
+				},
 			},
 			orderBy: {
 				isCheckedOut: "desc",
@@ -255,4 +286,4 @@ const generatePDF = async (req, res, next) => {
 	}
 };
 
-export default { get, checkout, getMany, generatePDF };
+export default { get, checkout, getMany, generatePDF, getCart };

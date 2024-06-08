@@ -47,6 +47,7 @@ userRouter.post("/api/orderitems", orderitemController.create);
 
 // Order API
 userRouter.get("/api/orders/report", orderController.generatePDF);
+userRouter.get("/api/orders/cart", orderController.getCart);
 userRouter.get("/api/orders/:id", orderController.get);
 userRouter.get("/api/orders", orderController.getMany);
 userRouter.post("/api/orders/checkout", orderController.checkout);
